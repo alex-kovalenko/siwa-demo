@@ -6,14 +6,14 @@ get '/' do
   "Hello, world"
 end
 
-get '/jwt/:token' do
+get '/jwt' do
   key_file = "key/siwa-demo.p8"
   team_id = "2FYPP5PESL"
   client_id = "com.sampleapp.master.siwa"
   key_id = "UW4AYX6DUH"
   validity_period = 100   # In days. Max 180 (6 months) according to Apple docs.
 
-  private_key = OpenSSL::PKey::EC.new IO.read key_file
+  private_key = OpenSSL::PKey::EC.new ENV['CERT']
 
   token = JWT.encode(
   	{
@@ -31,4 +31,9 @@ get '/jwt/:token' do
   )
   
   "#{token}"
+end
+
+get '/.well-known/apple-developer-domain-association.txt' do 
+  text = ENV['A_DOMAIN']
+  "#{text}"
 end
