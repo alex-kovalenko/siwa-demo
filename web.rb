@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'jwt'
 
+set :public_folder, File.dirname(__FILE__) + '/public'
 
 get '/' do
   "Hello, world"
@@ -31,9 +32,4 @@ get '/jwt' do
   )
   
   "#{token}"
-end
-
-get '/.well-known/apple-developer-domain-association.txt' do 
-  text = ENV['A_DOMAIN']
-  "#{text}"
 end
