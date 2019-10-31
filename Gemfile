@@ -6,3 +6,6 @@ gem 'sinatra'
 gem 'thin'
 
 gem 'jwt'
+gem 'net'
+gem 'json'
+
