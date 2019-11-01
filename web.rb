@@ -4,6 +4,7 @@ require 'net/http'
 require 'json'
 
 set :public_folder, File.dirname(__FILE__) + '/public'
+set :protection, :except => :path_traversal
 
 get '/' do
   "Hello, world"
@@ -18,16 +19,17 @@ end
 get '/link' do
   code = params[:code]
   client_id = params[:client_id]
-  jwt = jwt(client_id)
+  use_local = params[:use_local]
+  jwt = jwt(client_id, use_local)
 
   params = {
-           :code => code,
-           :grant_type   => "authorization_code",
-           :client_id   => client_id,
-           :client_secret => jwt
+   :code => code,
+   :grant_type   => "authorization_code",
+   :client_id   => client_id,
+   :client_secret => jwt
   }
+
   uri = URI('https://appleid.apple.com/auth/token')
-#  uri.query = URI.encode_www_form(params)
 
   res = Net::HTTP.post_form(uri, params)
 
@@ -42,16 +44,16 @@ get '/link' do
   }.to_json
 end
 
-def jwt (client_id)  
+def jwt (client_id, use_local)  
   key_file = "key/siwa-demo.p8"
   team_id = "2FYPP5PESL"
   key_id = "UW4AYX6DUH"
   validity_period = 100   # In days. Max 180 (6 months) according to Apple docs.
 
-  private_key = OpenSSL::PKey::EC.new ENV['CERT']
-
-  if !private_key.to_s.empty?
+  if use_local
     private_key = OpenSSL::PKey::EC.new IO.read key_file
+  else
+    private_key = OpenSSL::PKey::EC.new ENV['CERT']
   end
 
   token = JWT.encode(
