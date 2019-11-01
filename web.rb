@@ -19,13 +19,13 @@ get '/link' do
   code = params[:code]
   client_id = params[:client_id]
   jwt = jwt(client_id)
-  
-  params =  {
-           :code => "#{code}",
+
+  params = {
+           :code => code,
            :grant_type   => "authorization_code",
            :client_id   => client_id,
            :client_secret => jwt
-         }
+  }
   uri = URI('https://appleid.apple.com/auth/token')
 #  uri.query = URI.encode_www_form(params)
 
